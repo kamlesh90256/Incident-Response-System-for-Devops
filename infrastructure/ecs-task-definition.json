@@ -1,0 +1,47 @@
+{
+  "family": "devops-monitoring-backend",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::123456789012:role/replace-me-execution-role",
+  "taskRoleArn": "arn:aws:iam::123456789012:role/replace-me-task-role",
+  "containerDefinitions": [
+    {
+      "name": "backend",
+      "image": "ghcr.io/owner/repo/backend:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8000,
+          "hostPort": 8000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "ENVIRONMENT",
+          "value": "production"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "DATABASE_URL",
+          "valueFrom": "/devops-monitoring/database-url"
+        },
+        {
+          "name": "SECRET_KEY",
+          "valueFrom": "/devops-monitoring/secret-key"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/devops-monitoring-backend",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}

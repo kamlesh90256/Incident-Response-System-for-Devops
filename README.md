@@ -336,6 +336,50 @@ docker-compose up -d
 7. **Use secrets management** for sensitive data
 8. **Update CORS settings** for frontend domain
 
+### Deploying on GitHub Pages
+
+The repository includes a GitHub Actions workflow that builds the React frontend and publishes it to GitHub Pages.
+
+1. Enable GitHub Pages for the repository and select GitHub Actions as the source.
+2. Set a repository variable named `VITE_API_URL` to the backend API URL, such as `https://api.example.com/api/v1`.
+3. Optionally set a repository variable named `PAGES_CUSTOM_DOMAIN` to your custom domain, such as `dashboard.example.com`.
+4. If you use a custom domain, add the matching DNS records in your domain provider and configure the custom domain in GitHub Pages settings.
+5. Push to `main` or `master`, or run the `Deploy Frontend to GitHub Pages` workflow manually.
+
+Notes:
+- GitHub Pages hosts the frontend only.
+- The FastAPI backend must be deployed separately and exposed over HTTPS.
+- The frontend build automatically uses the repository name as the Pages base path.
+- When `PAGES_CUSTOM_DOMAIN` is set, the workflow writes a `CNAME` file into the published artifact.
+
+### Deploying the Backend on GitHub Container Registry
+
+The repository also includes a GitHub Actions workflow that builds the FastAPI backend Docker image and publishes it to GitHub Container Registry.
+
+1. Push to `main`, `master`, or a `v*` tag to publish a new image.
+2. Pull the image from `ghcr.io/<owner>/<repo>/backend`.
+3. Run the container behind your preferred host, reverse proxy, or orchestrator, and set `DATABASE_URL` and `ENVIRONMENT` in that runtime.
+
+Notes:
+- The workflow runs the backend test suite before building the image.
+- GitHub Packages permissions must be enabled for the repository if your org restricts package publishing.
+- This publishes the image; it does not provision database hosting or a public runtime by itself.
+
+### Deploying the Backend on AWS ECS
+
+The repository also includes a GitHub Actions workflow that tests the backend, builds the Docker image, pushes it to Amazon ECR, and deploys it to an ECS Fargate service.
+
+1. Create an AWS IAM role for GitHub Actions and save its ARN as the repository secret `AWS_ROLE_TO_ASSUME`.
+2. Set repository variables for `AWS_REGION`, `AWS_ECR_REPOSITORY`, `AWS_ECS_CLUSTER`, and `AWS_ECS_SERVICE`.
+3. Create the ECS task definition and update the placeholder IAM roles in [infrastructure/ecs-task-definition.json](infrastructure/ecs-task-definition.json).
+4. Store `DATABASE_URL` and `SECRET_KEY` in AWS Secrets Manager or SSM Parameter Store under the paths referenced in the task definition.
+5. Push to `main` or `master`, or run the `Deploy Backend to AWS ECS` workflow manually.
+
+Notes:
+- The backend now respects `DATABASE_URL`, including PostgreSQL URLs normalized to the async driver.
+- The workflow expects an existing ECS cluster, service, and ECR repository.
+- Update the ECS task definition log group and IAM roles to match your AWS account.
+
 ## Performance Optimization
 
 - Implement caching for frequently accessed data
