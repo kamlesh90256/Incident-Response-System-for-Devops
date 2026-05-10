@@ -341,14 +341,13 @@ docker-compose up -d
 The repository includes a single GitHub Actions workflow that deploys the frontend to GitHub Pages and publishes the backend image to GitHub Container Registry.
 
 1. Enable GitHub Pages for the repository and select GitHub Actions as the source.
-2. Set a repository variable named `VITE_API_URL` to the backend API URL that the frontend should call.
-3. Optionally set `PAGES_CUSTOM_DOMAIN` if you use a custom domain for the Pages site.
-4. Push to `main` or `master`, or run the `Deploy Project on GitHub` workflow manually.
+2. Push to `main` or `master`, or run the `Deploy Project on GitHub` workflow manually.
 
 Notes:
 - The frontend is hosted on GitHub Pages.
 - The backend is published as a container image to GHCR, so it can be deployed anywhere that can run Docker.
 - GitHub does not host the FastAPI process directly; it only stores and publishes the image.
+- The frontend is prewired to call `https://incident-response-api.onrender.com/api/v1`.
 
 ### Deploying on GitHub Pages
 
